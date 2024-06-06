@@ -5,7 +5,7 @@ from playground.config import Config
 from playground.ui.widgets import Tab
 
 
-class InstallTab(Tab):
+class DatabaseTab(Tab):
     def __init__(
         self, tab_control, playground_config: Config, task_manager, *args, **kwargs
     ):

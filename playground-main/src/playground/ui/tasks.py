@@ -20,15 +20,15 @@ PING_TIMEOUT = 5
 class Message:
     name: str
     kwargs: Optional[dict[str, Any]] = None
-    
+
 
 @dataclass
 class Task:
     callback: Callable
     threaded: bool = False
     on_complete: Optional[str] = None
-    
-    
+
+
 class Worker:
     def __init__(self, rx_queue, tx_queue):
         self.rx_queue = rx_queue
@@ -110,8 +110,8 @@ class Worker:
     
     def send_message(self, msg: Message):
         self.tx_queue.put_nowait(msg)
-    
-    
+
+
 class TaskManager:
     def __init__(self, log_queue, log_level=logging.INFO):
         self.tx_queue = Queue()

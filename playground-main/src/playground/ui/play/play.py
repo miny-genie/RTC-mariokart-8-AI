@@ -1,12 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
-from PIL import Image, ImageTk
 
-from playground.config import Config, MIN_WIDTH, MIN_HEIGHT
-from playground.constants import BASE_DIR
+from playground.config import Config
 from playground.ui.widgets import ScrollableFrameLegacy, Tab
 from playground.ui.play.filters import FiltersFrame
-
+from playground.ui.play.courses import CourseFrame
 
 class PlayTab(Tab):
     def __init__(
@@ -17,32 +15,25 @@ class PlayTab(Tab):
         self.playground_config = playground_config
         self.task_manager = task_manager
         
-        # declaration variables
-        common_padx = 1
-        common_pady = 1
-        self.weight = 0.85
-        self.image_width = int(MIN_WIDTH // 3 * 2 // 4 * self.weight)
-        self.image_height = int(MIN_HEIGHT * self.image_width // MIN_WIDTH)
-        self.course_images = [None]
-        self.course_buttons = [None]
-        
         # Configure
         self.rowconfigure(0, minsize=200)
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
-        self.rowconfigure(3, minsize=20)
-        self.columnconfigure(0, weight=0)
-        self.columnconfigure(1, minsize=250)
-        self.columnconfigure(2, minsize=250)
+        self.rowconfigure(3, minsize=60)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, minsize=240)
+        self.columnconfigure(2, minsize=240)
         
         # Left Root Frame
         self.play_wrapper = ttk.Frame(self)
-        self.play_wrapper.grid(row=0, column=0, rowspan=3, sticky="nsew")
+        self.play_wrapper.grid(row=0, column=0, rowspan=4, sticky="nsew")
         self.play_wrapper.columnconfigure(0, weight=1)
         self.play_wrapper.rowconfigure(1, weight=1)
         
         # Filters Frame
-        self.filter_frame = FiltersFrame(self.play_wrapper, play_tab=self)
+        self.filter_frame = FiltersFrame(
+            self.play_wrapper, play_tab=self, function_callback=self.filter_buttons
+        )
         self.filter_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         
         # Course Frame
@@ -50,109 +41,56 @@ class PlayTab(Tab):
             self.play_wrapper, text="Course"
         )
         self.scrollable_course_frame.grid(
-            row=1, column=0, columnspan=2, padx=5, pady=0, sticky="nsew"
+            row=1, column=0, padx=5, pady=5, sticky="nsew"
         )
-        self.course_frame = ttk.Frame(
-            self.scrollable_course_frame.scrollable_frame
+        self.course_frame = CourseFrame(
+            self.scrollable_course_frame.scrollable_frame, self, playground_config
         )
         self.course_frame.grid(row=1, column=0, sticky="nsew")
         
-        # Unsafe Playground Frame
-        self.right_frame = ttk.Frame(self)
-        self.right_frame.grid(row=0, column=1, sticky="nsew")
-        
-        # Play Button
-        self.button_play = ttk.Button(
-            self.right_frame, text="불안전한 놀이터!",
+        # Predictions Frame 1
+        self.predict_frame = ttk.LabelFrame(self, text="Prediction")
+        self.predict_frame.grid(
+            row=0, column=1, rowspan=2, padx=5, pady=5, sticky="nsew"
         )
-        self.button_play.grid(row=0, column=0, pady=5, padx=5, sticky="swe")
         
-        # Course Info
-        self.course_label = ttk.Label(self.right_frame, text="맵 이름: ")
-        self.course_label.grid()
-        self.course = ttk.Entry(self.right_frame, width=30)
+        # Predictions Result Frame 1
+        self.result_frame = ttk.LabelFrame(self, text="Result")
+        self.result_frame.grid(
+            row=2, column=1, padx=5, pady=5, sticky="nsew"
+        )
+                
+        # Predictions Button 1
+        self.button_play = ttk.Button(self, text="불안전한 놀이터!")
+        self.button_play.grid(row=3, column=1, pady=5, padx=5, sticky="nswe")
+        
+        # Course Info 1
+        self.course_label = ttk.Label(self.predict_frame, text="맵 이름: ")
+        self.course_label.grid(sticky="nswe")
+        self.course = ttk.Entry(self.predict_frame, width=25)
         self.course.grid()
         
-        # Add images
-        for i in range(1, 96+1):
-            image = self.load_image(i, self.image_width, self.image_height)
-            self.course_images.append(image)
-
-        # Add buttons
-        for row in range(24):
-            for col in range(4):
-                image_num = row * 4 + col + 1
-                button = tk.Button(
-                    self.course_frame,
-                    image=self.course_images[image_num],
-                    text=str(image_num),
-                    command=lambda img_num = image_num: self.launch(img_num),
-                )
-                button.grid(
-                    row=row,
-                    column=col,
-                    padx=common_padx,
-                    pady=common_pady,
-                    sticky="nswe"
-                )
-                self.course_buttons.append(button)
-                
-        # for i in range(24):
-        #     self.left_frame.grid_rowconfigure(i, weight=1)
-        # for j in range(4):
-        #     self.left_frame.grid_columnconfigure(j, weight=1)
-        
-        self.scrollable_course_frame.bind("<Configure>", self.resize_buttons)
-                
-        # for i in range(16):  # 16 행
-        #     for j in range(4):  # 4 열
-        #         # 각 칸에 Frame 생성
-        #         cell_frame = ttk.Frame(left_frame, width=100, height=120)
-        #         cell_frame.grid(row=i, column=j, padx=5, pady=5)
-                
-        #         # 이미지와 텍스트 레이블 추가
-        #         image_num = i * 4 + j + 1
-        #         image_name = f"course{image_num:03}.png"
-        #         image_path = BASE_DIR / "static" / "images"
-                
-        #         try:
-        #             image = Image.open(image_path)
-        #             image = image.resize((100, 80), Image.ANTIALIAS)
-        #             photo = ImageTk.PhotoImage(image)
-        #             image_label = ttk.Label(cell_frame, image=photo)
-        #             image_label.image = photo  # 참조 유지
-        #             image_label.pack(side="top")
-
-        #             # 텍스트 레이블
-        #             text_label = ttk.Label(cell_frame, text=f"Course {image_num}")
-        #             text_label.pack(side="bottom")
-        #         except FileNotFoundError:
-        #             print(f"Image not found: {image_path}")
-        #             continue
-        
-    def resize_buttons(self, event):
-        self.update_idletasks()
-        new_width = self.scrollable_course_frame.winfo_width() // 4
-        print(new_width)
-        for button in self.course_buttons:
-            button.config(
-                width=new_width,
-                height=self.image_height * new_width // self.image_width,
-                compound="center",
-            )
-        
-    def image_naming(self, num):
-        return f"course{num:03}.png"
-    
-    def load_image(self, num, width, height):
-        image_name = self.image_naming(num)
-        image_path = BASE_DIR / "static" / "images"
-        return ImageTk.PhotoImage(
-            Image.open(image_path / image_name).resize(
-                (width, height), Image.Resampling.LANCZOS
-            )
+        # Predictions Frame 2
+        self.predict_frame2 = ttk.LabelFrame(self, text="Prediction")
+        self.predict_frame2.grid(
+            row=0, column=2, rowspan=2, padx=5, pady=5, sticky="nsew"
         )
         
-    def launch(self, t):
-        self.course.delete(0, tk.END)
-        self.course.insert(0, t)
+        # Predictions Result Frame 2
+        self.result_frame2 = ttk.LabelFrame(self, text="Result")
+        self.result_frame2.grid(
+            row=2, column=2, padx=5, pady=5, sticky="nsew"
+        )
+                
+        # Predictions Button 2
+        self.button_play2 = ttk.Button(self, text="불안전한 놀이터!")
+        self.button_play2.grid(row=3, column=2, pady=5, padx=5, sticky="nswe")
+        
+        # Course Info 2
+        self.course_label2 = ttk.Label(self.predict_frame2, text="맵 이름: ")
+        self.course_label2.grid(sticky="nswe")
+        self.course2 = ttk.Entry(self.predict_frame2, width=25)
+        self.course2.grid()
+        
+    def filter_buttons(self, search_term):
+        self.course_frame.filter_buttons(search_term)

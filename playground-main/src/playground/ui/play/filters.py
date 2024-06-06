@@ -9,11 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 class FiltersFrame(ttk.LabelFrame):
-    def __init__(self, parent, play_tab):
+    def __init__(self, parent, play_tab, function_callback):
         logger.debug("Initailizing Playground FiltersFrame")
         super().__init__(parent, text="Filters")
         self.parent = parent
         self.play_tab = play_tab
+        self.function_callback = function_callback
         
         self.name_label = ttk.Label(self, text="Course Name:")
         self.name_label.grid(row=0, column=0, padx=(5, 0), pady=(5, 5), sticky="w")
@@ -39,6 +40,8 @@ class FiltersFrame(ttk.LabelFrame):
             row=0, column=3, padx=(5, 0), pady=(5, 5), sticky="w"
         )
         
+        self.name.bind("<KeyRelease>", self.filter_buttons)
+        
     def selected_command(self, _event=None):
         self.play_tab.packs_frame.render_packs()
     
@@ -47,3 +50,7 @@ class FiltersFrame(ttk.LabelFrame):
         if name != self.name_last_seen:
             self.name_last_seen = name
             self.play_tab.packs_frame.render_packs()
+            
+    def filter_buttons(self, event):
+        search_term = self.name.get()
+        self.function_callback(search_term)

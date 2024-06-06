@@ -17,7 +17,7 @@ from playground.utils import tb_info, temp_chdir
 
 from playground.ui.error import ErrorTab
 # from playground.ui.extract import ExtractTab
-from playground.ui.install import InstallTab
+from playground.ui.database import DatabaseTab
 from playground.ui.logs import QueueHandler, register_queue_handler
 from playground.ui.play import PlayTab
 from playground.ui.tasks import TaskManager, PING_INTERVAL
@@ -76,12 +76,26 @@ class PlaygroundUI:
         self.queue_handler = QueueHandler(self.log_queue)
         register_queue_handler(self.queue_handler, log_level)
         self.task_manager = TaskManager(self.log_queue, log_level)
-        # self.task_manager.register_task()
-        # self.task_manager.register_handler()
-        # self.task_manager.register_task()
-        # self.task_manager.register_handler()
+        self.task_manager.register_task(
+            "playgruond:update_start",
+            update_start,
+            True,
+            on_complete="playground:update_complete",
+        )
+        self.task_manager.register_handler(
+            "playground:update_complete", self.update_complete
+        )
+        self.task_manager.register_task(
+            "playground:check_for_latest",
+            check_for_latest,
+            True,
+        )
+        self.task_manager.register_handler(
+            "playground:latest_version", self.handle_playground_latest_version
+        )
         
         self.root = tk.Tk(className="Playground")
+        
         self.load_themes()
         style = ttk.Style(self.root)
         self.root.default_theme = style.theme_use()
@@ -162,7 +176,7 @@ class PlaygroundUI:
         # self.register_tab()
         self.register_tab(
             "database",
-            InstallTab,
+            DatabaseTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
@@ -198,23 +212,29 @@ class PlaygroundUI:
         )
         self.version_label.grid(column=0, row=3, padx=5, sticky="e")
         
-        # self.ws_thread = None
-        # self.task_manager.start_process()
-        # self.last_ping = time.time()
+        self.ws_thread = None
+        #  self.task_manager.start_process()
+        self.last_ping = time.time()
         # self.root.after(100, self.after_task_manager)
         # self.root.after(1000, self.after_ws_thread)
         # self.root.after(1000, self.after_record_win)
-        # self.check_for_updates()
+        self.check_for_updates()
         # self.check_requirments()
         
-    def check_for_updates():
-        return
+    def check_for_updates(self):
+        if self.needs_update:
+            return
+        
+        self.task_manager.call("playground:check_for_latest")
+        self.root.after(self.CHECK_LATEST_INTERVAL, self.check_for_updates)
     
+    @staticmethod
     def check_requirments():
         return
     
-    def handle_playground_latest_version():
-        return
+    def handle_playground_latest_version(self, playground_latest_version):
+        if not IS_EXE:
+            return
     
     def after_ws_thread():
         return
@@ -222,17 +242,44 @@ class PlaygroundUI:
     def after_record_win():
         return
     
-    def after_task_manager():
+    def after_task_manager(self):
+        if not self.task_manager.is_alive():
+            # Worker process went away, but shutting down so just return.
+            if self._shutting_down:
+                return
+            
+            # Worker process went away unexpectedly, Restart it.
+            logger.critical("Worker process went away, Restarting it.")
+            self.task_manager.start_process()
+            self.root.after(100, self.after_task_manager)
+            
+        # Send regular pings so the worker process knows.
+        now = time.time()
+        if now - self.last_ping > PING_INTERVAL:
+            self.last_ping = now
+            self.task_manager.ping()
+            
+        while True:
+            msg = self.task_manager.receive_message()
+            if msg is None:
+                self.root.after(100, self.after_task_manager)
+                return
+            
+            self.root.after_idle(self.task_manager.dispatch, msg)
+    
+    def handle_resize(self, event):
+        if not isinstance(event.widget, tk.Tk):
+            return
+        self.last_geometry = self.root.geometry()
+    
+    def update(self):
         return
     
-    def handle_resize():
-        return
+    def update_complete(self):
+        self.quit()
     
-    def update():
-        return
-    
-    def update_complete():
-        return
+    def register_shutdown_handler(self, func):
+        self._shutdown_handlers.append(func)
     
     def select_last_tab(self):
         last_tab = self.tabs.get(self.playground_config.last_tab)
@@ -316,10 +363,7 @@ class PlaygroundUI:
         self.task_manager.quit()
         self.root.quit()
         self.root.destroy()
-    
-    def register_shutdown_handler():
-        return
-    
+        
     def load_themes(self):
         static_dir = BASE_DIR / "static"
         themes_dir = static_dir / "themes"
@@ -332,7 +376,8 @@ class PlaygroundUI:
             self.root.mainloop()
         except KeyboardInterrupt:
             self.quit()
-            
-            
-window = PlaygroundUI(Config)
+
+
+config = Config()
+window = PlaygroundUI(config)
 window.mainloop()

@@ -19,6 +19,52 @@ class ScrolledText(ttk.Frame):
         
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0,weight=1)
+        
+        # Keycode for ScrolledText UI drawing
+        vsb.grid(row=0, column=1, sticky="ns")
+        self.text.grid(row=0, column=0, sticky="nsew")
+
+
+# Adapted from https://beenje.github.io/blog/posts/logging-to-a-tkinter-scrolledtext-widget/
+class ConsoleWindow(ttk.Frame):
+    def __init__(self, queue_handler, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Create a ScrollText widget
+        self.scrolled_text = ScrolledText(self, height=5, state="disabled")
+        self.scrolled_text.pack(expand=True, fill="both")
+        self.scrolled_text.text.configure(font="TkFixedFont")
+        self.scrolled_text.text.tag_config("INFO", foreground="green")
+        self.scrolled_text.text.tag_config("DEBUG", foreground="gray")
+        self.scrolled_text.text.tag_config("WARNING", foreground="orange")
+        self.scrolled_text.text.tag_config("ERROR", foreground="red")
+        self.scrolled_text.text.tag_config("CRITICAL", foreground="red", underline=1)
+        
+        # Create a logging handler using a queue
+        self.queue_handler = queue_handler
+        
+        # Start polling messages using a queue
+        self.after(100, self.poll_log_queue)
+        
+    def display(self, record):
+        msg = self.queue_handler.format(record)
+        self.scrolled_text.text.configure(state="normal")
+        self.scrolled_text.text.insert(tk.END, msg + "\n", record.levelname)
+        self.scrolled_text.text.configure(state="disabled")
+        self.scrolled_text.text.yview(tk.END)
+    
+    def poll_log_queue(self):
+        while True:
+            try:
+                record = self.queue_handler.log_queue.get(block=False)
+            except Empty:
+                break
+            else:
+                self.display(record)
+        self.after(100, self.poll_log_queue)
+        
+    def close(self):
+        pass
 
 
 class ScrollableMixin:
@@ -107,47 +153,6 @@ class ScrollableFrameLegacy(ScrollableMixin, ttk.LabelFrame):
         self.canvas.bind("<Configure>", self._configure_canvas)
         self.canvas.bind("<Enter>", self._bind_to_mousewheel)
         self.canvas.bind("<Leave>", self._unbind_from_mousewheel)
-
-
-class ConsoleWindow(ttk.Frame):
-    def __init__(self, queue_handler, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        # Create a ScrollText widget
-        self.scrolled_text = ScrolledText(self, height=5, state="disabled")
-        self.scrolled_text.pack(expand=True, fill="both")
-        self.scrolled_text.text.configure(font="TkFixedFont")
-        self.scrolled_text.text.tag_config("INFO", foreground="green")
-        self.scrolled_text.text.tag_config("DEBUG", foreground="gray")
-        self.scrolled_text.text.tag_config("WARNING", foreground="orange")
-        self.scrolled_text.text.tag_config("ERROR", foreground="red")
-        self.scrolled_text.text.tag_config("CRITICAL", foreground="red", underline=1)
-        
-        # Create a logging handler using a queue
-        self.queue_handler = queue_handler
-        
-        # Start polling messages using a queue
-        self.after(100, self.poll_log_queue)
-        
-    def display(self, record):
-        msg = self.queue_handler.format(record)
-        self.scrolled_text.text.configure(state="normal")
-        self.scrolled_text.text.insert(tk.END, msg + "\n", record.levelname)
-        self.scrolled_text.text.configure(state="disabled")
-        self.scrolled_text.text.yview(tk.END)
-    
-    def poll_log_queue(self):
-        while True:
-            try:
-                record = self.queue_handler.log_queue.get(block=False)
-            except Empty:
-                break
-            else:
-                self.display(record)
-        self.after(100, self.poll_log_queue)
-        
-    def close(self):
-        pass
 
 
 class ToolTip:
