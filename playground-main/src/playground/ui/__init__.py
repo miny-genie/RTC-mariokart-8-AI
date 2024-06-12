@@ -175,14 +175,28 @@ class PlaygroundUI:
         )
         # self.register_tab()
         self.register_tab(
-            "database",
+            "Database",
             DatabaseTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
         )
         # self.register_tab()
+        self.register_tab(
+            "Tracker",
+            DatabaseTab,
+            tab_control=self.tab_control,
+            playground_config=playground_config,
+            task_manager=self.task_manager,
+        )
         # self.register_tab()
+        self.register_tab(
+            "Settings",
+            DatabaseTab,
+            tab_control=self.tab_control,
+            playground_config=playground_config,
+            task_manager=self.task_manager,            
+        )
         # self.register_tab()
         # self.register_tab()
         

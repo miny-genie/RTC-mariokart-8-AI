@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class FiltersFrame(ttk.LabelFrame):
-    def __init__(self, parent, play_tab, function_callback):
+    def __init__(self, parent, play_tab, function_callback=None):
         logger.debug("Initailizing Playground FiltersFrame")
         super().__init__(parent, text="Filters")
         self.parent = parent
