@@ -1,6 +1,7 @@
 from playground.korean_regexp.constants import (
     BASE, INITIALS, MEDIALS, FINALES, MIXED, PRESENT_ON_KEYBOARD,
 )
+from playground.korean_regexp.decomposition import get_phonemes
 
 COMPLEX_DICT = {''.join(map(str, v)): k for k, v in MIXED.items()}
 
@@ -36,6 +37,9 @@ def assemble(lst: list) -> str:
 
 
 def implode(_input: str|list[str]) -> str:
+    if isinstance(_input, str):
+        _input = list(_input)
+    
     chars = []
     
     # 인접한 모음을 하나의 복합 모음으로 결합.
@@ -71,7 +75,7 @@ def implode(_input: str|list[str]) -> str:
     for i, cur in enumerate(items):
         if i > 0:
             prev = items[i - 1]
-            if prev["medial"] is None or len(prev["finale"]) == 1:
+            if ("medial" not in prev or prev["medial"] is None) or len(prev["finale"]) == 1:
                 cur["initial"] = prev["finale"]
                 prev["finale"] = []
             else:
@@ -85,7 +89,7 @@ def implode(_input: str|list[str]) -> str:
                 fir, sec, *remain = cur["finale"]
                 if f"{fir}{sec}" in COMPLEX_DICT:
                     cur["finale"] = [COMPLEX_DICT[f"{fir}{sec}"]] + remain
-        
+    
     groups = []
     
     # 각 글자에 해당하는 블록 단위로 조합.
@@ -120,5 +124,21 @@ def implode(_input: str|list[str]) -> str:
     return ''.join(assemble(group) for group in groups)
 
 
-def explode():
-    return
+def explode(text: str, grouped: bool = False) -> list[str]:
+    accum = []
+    for char in text:
+        phonemes = get_phonemes(char)
+        init, mid, final, init_offset, mid_offset, final_offset = phonemes
+        
+        if init_offset != -1 or mid_offset != -1 or final_offset != -1:
+            parts = [
+                init,
+                MIXED[mid] if mid in MIXED and mid not in PRESENT_ON_KEYBOARD else mid,
+                MIXED[final] if final in MIXED and final not in PRESENT_ON_KEYBOARD else final
+            ]
+            parts = [sub for part in parts for sub in part if sub]
+        else:
+            parts = [char]
+        accum.append(parts)
+        
+    return accum if grouped else sum(accum, [])

@@ -1,19 +1,26 @@
 from playground.korean_regexp.constants import (
-    BASE, INITIALS, MEDIALS, FINALES, MIXED, MEDIAL_RANGE,
+    BASE, INITIALS, MEDIALS, FINALES,
 )
 
 
-def decompose_korean(char: str) -> tuple[str]:
-    if not char: return ""
-    elif char == " ": return " "
-    elif ord("ㄱ") <= ord(char) <= ord("ㅎ"): return char
-    
-    unicode = ord(char) - BASE
-    len_jung, len_jong = len(MEDIALS), len(FINALES)
-    
-    cho  = (unicode // len_jong) // len_jung
-    jung = (unicode // len_jong) % len_jung
-    jong = unicode % len_jong
+def get_phonemes(char: str) -> tuple:
+    init, mid, final = "", "", ""
+    init_offset, mid_offset, final_offset = -1, -1, -1
 
-    if FINALES[jong] == " ": return INITIALS[cho], MEDIALS[jung]
-    else: return INITIALS[cho], MEDIALS[jung], FINALES[jong]
+    if ord("ㄱ") <= ord(char) <= ord("ㅎ"):
+        init = char
+        init_offset = INITIALS.index(char)
+        
+    elif ord("가") <= ord(char) <= ord("힣"):
+        unicode = ord(char) - BASE
+        len_mid, len_final = len(MEDIALS), len(FINALES)
+        
+        init_offset = (unicode // len_final) // len_mid
+        mid_offset = (unicode // len_final) % len_mid
+        final_offset = unicode % len_final
+        
+        init = INITIALS[init_offset]
+        mid = MEDIALS[mid_offset]
+        final = FINALES[final_offset]
+        
+    return init, mid, final, init_offset, mid_offset, final_offset

@@ -3,10 +3,12 @@ import logging
 from playground.korean_regexp.constants import (
     BASE, INITIALS, MEDIALS, FINALES, MIXED, MEDIAL_RANGE,
 )
+from playground.korean_regexp.decomposition import get_phonemes
+from playground.korean_regexp.escape import escape_regexp
 from playground.korean_regexp.string_utils import assemble, implode, explode
 from playground.korean_regexp.translation import eng_to_kor, kor_to_eng
-from playground.korean_regexp.escape import escape_regexp
-from playground.korean_regexp.decomposition import decompose_korean
+
+logger = logging.getLogger(__name__)
 
 
 def get_initial_search_regexp(initial, allow_only_initial=False):
