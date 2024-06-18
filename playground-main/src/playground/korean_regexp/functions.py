@@ -9,6 +9,7 @@ from playground.korean_regexp.escape import escape_regexp
 from playground.korean_regexp.string_utils import assemble, implode, explode
 from playground.korean_regexp.translation import eng_to_kor, kor_to_eng
 
+
 logger = logging.getLogger(__name__)
 
 FUZZY = f"__{int('fuzzy', 36)}__"
@@ -83,7 +84,7 @@ def get_reg_exp(
     search: str,
     initial_search = False, starts_with = False, ends_with = False,
     ignore_space = False, ignore_case = True, _global = False,
-    fuzzy = False, non_capture_group = False, eng_to_kor = False
+    fuzzy = False, non_capture_group = False, _eng_to_kor = False
 ):
     global last_search, last_pattern
     
@@ -93,7 +94,7 @@ def get_reg_exp(
     _search = search
     add_patterns = []
     
-    if eng_to_kor and re.match(r'^([a-zA-Z0-9\s]{2,})$', search.strip()):
+    if _eng_to_kor and re.match(r'^([a-zA-Z0-9\s]{2,})$', search.strip()):
         kor = eng_to_kor(search.strip())
         if re.match(r'^[가-힣ㄱ-ㅎ0-9]', kor):
             _search = kor
@@ -104,6 +105,7 @@ def get_reg_exp(
     
     phonemes = get_phonemes(last_char)
     init, mid, final, init_offset, mid_offset, final_offset = phonemes
+    last_char_pattern = ""
     
     # 마지막 글자가 한글인 경우에만 실행
     if init_offset != -1:
@@ -135,14 +137,14 @@ def get_reg_exp(
             else:
                 _from = base_code + mid_offset * len(FINALES)
                 to = _from + len(FINALES) - 1
-            patterns.append(f"{chr(_from)}-{chr(to)}")
+            patterns.append(f"[{chr(_from)}-{chr(to)}]")
         
         # case 3) 초성만 입력된 경우
         elif init:
             patterns.append(get_initial_search_regexp(init, True))
-                
+          
         # last_char_pattern 선언
-        if patterns:
+        if len(patterns) > 1:
             if non_capture_group:
                 last_char_pattern = f"(?:{'|'.join(patterns)})"
             else:
@@ -172,13 +174,13 @@ def get_reg_exp(
     # 정규식 생성
     if glue:
         pattern = re.sub(FUZZY, ".*", pattern)
-        pattern = re.sub(IGNORE_SPACE, r'\s*', pattern)
+        pattern = re.sub(IGNORE_SPACE, r'\\s*', pattern)
         
     if add_patterns:
         combined = add_patterns + [pattern]
         print(combined)
         pattern = "|".join(f'({comb})' for comb in combined)
-        
+    
     flags = re.IGNORECASE if ignore_case else 0
     last_pattern = re.compile(pattern, flags)
     return last_pattern

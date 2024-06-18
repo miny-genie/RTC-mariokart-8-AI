@@ -11,6 +11,9 @@ if is_windows():
     import winshell
 
 from playground.ui.database.constants import COURSE_NAMING
+from playground.korean_regexp.functions import (
+    get_reg_exp as re_korean, eng_to_kor, kor_to_eng
+)
 
 
 logger = logging.getLogger(__name__)
@@ -126,17 +129,6 @@ class CourseFrame(ttk.Frame):
             else:
                 self.is_visible[idx] = False
                 self.course_buttons[idx].grid_remove()
-                self.course_labels[idx].grid_remove()    
-        
-        # for idx, btn_name in enumerate(self.button_name):
-        #     if btn_name is None:
-        #         continue
-            
-        #     if search_term in btn_name:
-        #         self.is_visible[idx] = True
-        #         self.course_buttons[idx].grid()
-        #     else:
-        #         self.is_visible[idx] = False
-        #         self.course_buttons[idx].grid_remove()
+                self.course_labels[idx].grid_remove()
         
         self.update_grid()

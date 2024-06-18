@@ -4,6 +4,11 @@ import tkinter as tk
 from tkinter import PhotoImage, ttk
 import webbrowser
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QInputMethodEvent
+from PyQt5.QtWidgets import QLineEdit
+
+
 from playground.config import Config
 from playground.constants import BASE_DIR
 from playground.utils import is_windows

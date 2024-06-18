@@ -3,7 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 
 from playground.ui.widgets import DebounceEntry
-
+from playground.korean_regexp.functions import (
+    get_reg_exp as re_korean, eng_to_kor, kor_to_eng
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +53,11 @@ class FiltersFrame(ttk.LabelFrame):
             self.name_last_seen = name
             self.play_tab.packs_frame.render_packs()
             
+    def IME_test(self, event):
+        search_term = self.name.get()
+        print(search_term)
+            
     def filter_buttons(self, event):
         search_term = self.name.get()
+        print(search_term)
         self.function_callback(search_term)
