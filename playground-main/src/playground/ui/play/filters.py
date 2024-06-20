@@ -27,15 +27,16 @@ class FiltersFrame(ttk.LabelFrame):
         
         self.selected_label = ttk.Label(self, text="Hint:")
         self.selected_label.grid(row=0, column=2, padx=(5, 0), pady=(5, 5), sticky="w")
-        self.selected_var = tk.StringVar(value="검색 힌트보기")
+        init_text = "한글 검색을 구현 중이니 영문으로 검색해주세요 (예: 빅 블루 > qlr qmffn)"
+        self.selected_var = tk.StringVar(value=init_text)
         self.selected_dropdown = ttk.OptionMenu(
             self,
             self.selected_var,
             self.selected_var.get(),
-            "검색 힌트보기",
-            "맵 이름으로 검색이 가능합니다.",
-            "컵 이름으로도 검색이 가능합니다.",
-            "이스터에그도 있습니다. (ex:개블루)",
+            init_text,
+            "맵 이름으로 검색이 가능합니다. (예: 빅 블루)",
+            "컵 종류로도 검색이 가능합니다. (예: 젤다 컵)",
+            "그랑프리로도 검색이 가능합니다. (예: 니트로 그랑프리)",
             command=self.selected_command,
         )
         self.selected_dropdown.grid(
@@ -59,5 +60,4 @@ class FiltersFrame(ttk.LabelFrame):
             
     def filter_buttons(self, event):
         search_term = self.name.get()
-        print(search_term)
         self.function_callback(search_term)

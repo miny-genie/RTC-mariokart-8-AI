@@ -1,4 +1,5 @@
 import logging
+import re
 import tkinter as tk
 from pathlib import Path
 from PIL import Image, ImageTk
@@ -12,7 +13,7 @@ if is_windows():
 
 from playground.ui.database.constants import COURSE_NAMING
 from playground.korean_regexp.functions import (
-    get_reg_exp as re_korean, eng_to_kor, kor_to_eng
+    get_reg_exp as re_korean, kor_to_eng, KMP
 )
 
 
@@ -112,23 +113,41 @@ class CourseFrame(ttk.Frame):
         def isENG(text: str) -> bool:
             return ''.join(text.split()).encode().isalnum()
         
-        def convert(text: str) -> str:
+        def convert_eng(text: str) -> str:
             return ''.join(text.split()).lower()
         
-        # name = [grandprix_KOR, grandprix_ENG, cup_KOR, cup_ENG, track_KOR, track_ENG]
-        # kor_idx, eng_idx = [0, 2, 4], [1, 3, 5]
+        if not search_term:
+            for idx in range(1, 96+1):
+                self.is_visible[idx] = True
+                self.course_buttons[idx].grid()
+                self.course_labels[idx].grid()
+                self.update_grid()
+            return
         
-        search_term = search_term.lower()
+        eng_search_term = convert_eng(search_term)
+        kor_search_term = ''.join(search_term.split())
+        # kor_search_term = re_korean(search_term, initial_search=True, _eng_to_kor=True)
+        kmp = KMP()
+        
         for idx, (_, names) in enumerate(COURSE_NAMING.items(), 1):
-            for name in names:
-                if isENG(name) and convert(search_term) in convert(name):
-                    self.is_visible[idx] = True
-                    self.course_buttons[idx].grid()
-                    self.course_labels[idx].grid()
-                    break
+            for lang, name in enumerate(names):
+                if lang % 2: # eng name
+                    if kmp.search(convert_eng(name), eng_search_term):
+                        self.is_visible[idx] = True
+                        self.course_buttons[idx].grid()
+                        self.course_labels[idx].grid()
+                        break
+                    
+                else:   # kor name
+                    # if re.findall(kor_search_term, name):
+                    if kmp.search(''.join(kor_to_eng(name).split()), kor_search_term):
+                        self.is_visible[idx] = True
+                        self.course_buttons[idx].grid()
+                        self.course_labels[idx].grid()
+                        break
             else:
                 self.is_visible[idx] = False
                 self.course_buttons[idx].grid_remove()
                 self.course_labels[idx].grid_remove()
-        
+            
         self.update_grid()
