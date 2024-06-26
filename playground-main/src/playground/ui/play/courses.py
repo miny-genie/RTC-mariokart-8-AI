@@ -18,6 +18,7 @@ from playground.korean_regexp.functions import (
 
 
 logger = logging.getLogger(__name__)
+kmp = KMP()
 
 
 class CourseFrame(ttk.Frame):
@@ -127,7 +128,6 @@ class CourseFrame(ttk.Frame):
         eng_search_term = convert_eng(search_term)
         kor_search_term = ''.join(search_term.split())
         # kor_search_term = re_korean(search_term, initial_search=True, _eng_to_kor=True)
-        kmp = KMP()
         
         for idx, (_, names) in enumerate(COURSE_NAMING.items(), 1):
             for lang, name in enumerate(names):
