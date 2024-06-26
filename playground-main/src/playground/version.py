@@ -12,7 +12,7 @@ def latest_version():
     try:
         return version.parse(
             requests.get(
-                "https://api.github.com/repos/miny-genie/playground/releases/latest",
+                "https://api.github.com/repos/miny-genie/RTC-mariokart-8-AI/releases/latest",
                 timeout=5,
             ).json()["tag_name"]
         )
