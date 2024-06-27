@@ -3,8 +3,11 @@ from tkinter import ttk
 
 from playground.config import Config
 from playground.ui.widgets import ScrollableFrameLegacy, Tab
-from playground.ui.play.filters import FiltersFrame
 from playground.ui.play.courses import CourseFrame
+from playground.ui.play.filters import FiltersFrame
+from playground.ui.play.predictions import FirstPredictionFrame, SecondPredictionFrame
+from playground.ui.play.results import ResultFrame
+
 
 class PlayTab(Tab):
     def __init__(
@@ -18,7 +21,7 @@ class PlayTab(Tab):
         # Configure
         self.rowconfigure(0, minsize=200)
         self.rowconfigure(1, weight=1)
-        self.rowconfigure(2, weight=1)
+        self.rowconfigure(2, minsize=100)
         self.rowconfigure(3, minsize=60)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, minsize=240)
@@ -48,49 +51,36 @@ class PlayTab(Tab):
         )
         self.course_frame.grid(row=1, column=0, sticky="nsew")
         
-        # Predictions Frame 1
-        self.predict_frame = ttk.LabelFrame(self, text="Prediction")
+        # Track 1: Predictions Frame
+        self.predict_frame = FirstPredictionFrame(self)
         self.predict_frame.grid(
             row=0, column=1, rowspan=2, padx=5, pady=5, sticky="nsew"
         )
         
-        # Predictions Result Frame 1
-        self.result_frame = ttk.LabelFrame(self, text="Result")
-        self.result_frame.grid(
-            row=2, column=1, padx=5, pady=5, sticky="nsew"
-        )
+        # Track 1: Result Frame
+        self.result_frame = ResultFrame(self)
+        self.result_frame.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
                 
-        # Predictions Button 1
+        # Track 1: Button
         self.button_play = ttk.Button(self, text="불안전한 놀이터!")
         self.button_play.grid(row=3, column=1, pady=5, padx=5, sticky="nswe")
         
-        # Course Info 1
-        self.course_label = ttk.Label(self.predict_frame, text="맵 이름: ")
-        self.course_label.grid(sticky="nswe")
-        self.course = ttk.Entry(self.predict_frame, width=25)
-        self.course.grid()
-        
-        # Predictions Frame 2
-        self.predict_frame2 = ttk.LabelFrame(self, text="Prediction")
+        # Track 2: Predictions Frame
+        self.predict_frame2 = SecondPredictionFrame(self)
         self.predict_frame2.grid(
             row=0, column=2, rowspan=2, padx=5, pady=5, sticky="nsew"
         )
         
-        # Predictions Result Frame 2
-        self.result_frame2 = ttk.LabelFrame(self, text="Result")
-        self.result_frame2.grid(
-            row=2, column=2, padx=5, pady=5, sticky="nsew"
-        )
+        # Track 2: Result Frame
+        self.result_frame2 = ResultFrame(self)
+        self.result_frame2.grid(row=2, column=2, padx=5, pady=5, sticky="nsew")
                 
-        # Predictions Button 2
+        # Track 2: Button
         self.button_play2 = ttk.Button(self, text="불안전한 놀이터!")
         self.button_play2.grid(row=3, column=2, pady=5, padx=5, sticky="nswe")
         
-        # Course Info 2
-        self.course_label2 = ttk.Label(self.predict_frame2, text="맵 이름: ")
-        self.course_label2.grid(sticky="nswe")
-        self.course2 = ttk.Entry(self.predict_frame2, width=25)
-        self.course2.grid()
-        
     def filter_buttons(self, search_term):
         self.course_frame.filter_buttons(search_term)
+    
+    def predict(self):
+        return
