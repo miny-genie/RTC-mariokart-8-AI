@@ -25,7 +25,7 @@ class FirstPredictionFrame(ttk.LabelFrame):
         )
         self.course_label.grid(column=0, padx=5, pady=5, sticky="we")
         self.course = ttk.Entry(self, width=25)
-        self.course.grid()
+        self.course.grid(column=0, padx=5, pady=5, sticky="we")
         
         # N판
         self.game_count_label = ttk.Label(
@@ -81,10 +81,11 @@ class FirstPredictionFrame(ttk.LabelFrame):
         return
 
 
-class SecondPredictionFrame(ttk.LabelFrame):
+class SecondPredictionFrame(FirstPredictionFrame):
     def __init__(self, parent):
         logger.debug("Initializing Playground SecondPredictionFrame")
-        super().__init__(parent, text="Track 2")
+        super().__init__(parent)
+        self.config(text="Track 2")
         self.parent = parent
         
         # # Course Info

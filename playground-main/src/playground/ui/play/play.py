@@ -2,11 +2,11 @@ import tkinter as tk
 from tkinter import ttk
 
 from playground.config import Config
-from playground.ui.widgets import ScrollableFrameLegacy, Tab
 from playground.ui.play.courses import CourseFrame
 from playground.ui.play.filters import FiltersFrame
 from playground.ui.play.predictions import FirstPredictionFrame, SecondPredictionFrame
 from playground.ui.play.results import ResultFrame
+from playground.ui.widgets import ScrollableFrameLegacy, Tab
 
 
 class PlayTab(Tab):
