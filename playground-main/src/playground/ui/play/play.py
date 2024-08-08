@@ -1,7 +1,13 @@
+import joblib
+import pandas as pd
+from sklearn.base import BaseEstimator
+from sklearn.decomposition import PCA
 import tkinter as tk
 from tkinter import ttk
 
 from playground.config import Config
+from playground.constants import BASE_DIR
+from playground.ui.database.constants import COURSE_TO_ENCODE, COURSE_NAMING
 from playground.ui.play.courses import CourseFrame
 from playground.ui.play.filters import FiltersFrame
 from playground.ui.play.predictions import FirstPredictionFrame, SecondPredictionFrame
@@ -17,6 +23,9 @@ class PlayTab(Tab):
         self.tab_control = tab_control
         self.playground_config = playground_config
         self.task_manager = task_manager
+        self.track_1_reg_model = self.load_model(version="reg", track=1)
+        self.track_1_clf_model = self.load_model(version="clf", track=1)
+        self.pca = self.load_model(version="pca")
         
         # Configure
         self.rowconfigure(0, minsize=200)
@@ -62,7 +71,7 @@ class PlayTab(Tab):
         self.result_frame.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
                 
         # Track 1: Button
-        self.button_play = ttk.Button(self, text="불안전한 놀이터!")
+        self.button_play = ttk.Button(self, text="불안전한 놀이터!", command=self.predict)
         self.button_play.grid(row=3, column=1, pady=5, padx=5, sticky="nswe")
         
         # Track 2: Predictions Frame
@@ -78,9 +87,46 @@ class PlayTab(Tab):
         # Track 2: Button
         self.button_play2 = ttk.Button(self, text="불안전한 놀이터!")
         self.button_play2.grid(row=3, column=2, pady=5, padx=5, sticky="nswe")
-        
+    
+    def load_model(self, version: str, track: int = 0) -> BaseEstimator:
+        model_path = BASE_DIR / "static" / "models"
+        if version == "pca":
+            loaded_file = f"pca.pkl"
+        else:
+            loaded_file = f"track_{track}_{version}_model.pkl"
+        loaded_model = joblib.load(model_path / loaded_file)
+        return loaded_model
+    
     def filter_buttons(self, search_term):
         self.course_frame.filter_buttons(search_term)
     
-    def predict(self):
+    ''' 이 부분 label-encoding 번호 일치시키기 '''
+    ''' One-Hot Encoding 바꿔서 pca.fit_transform 다시 하고, [0] * 96으로 '''
+    def predict(self) -> None:
+        course = self.predict_frame.course_entry.get()
+        for names in COURSE_NAMING.values():
+            if course in names:
+                encode = COURSE_TO_ENCODE[names[5]]
+        
+        data = [False] * 91
+        data[encode] = True
+        pca_transfrom = self.pca.transform(pd.DataFrame(data).T)[0]
+        
+        game_count = int(self.predict_frame.game_count.get())
+        game_goal = int(self.predict_frame.game_goal.get())
+        cur_game_count = 1
+        cc = int(self.predict_frame.cc.get())
+        part_people = int(self.predict_frame.part_people.get())
+        pre_data = [game_count, game_goal, cur_game_count, cc, part_people]
+        dummy = [pre_data + list(pca_transfrom)]
+
+        reg_result = self.track_1_reg_model.predict(dummy)
+        clf_result = self.track_1_clf_model.predict(dummy)
+        
+        self.result_frame.success_probability.config(
+            text=f"{clf_result}"
+        )
+        self.result_frame.rank_probability.config(
+            text=f"{reg_result}"
+        )
         return

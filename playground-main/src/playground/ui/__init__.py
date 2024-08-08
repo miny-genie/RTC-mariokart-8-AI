@@ -15,12 +15,14 @@ from playground.version import current_version, latest_version
 from playground.config import Config, MIN_WIDTH, MIN_HEIGHT
 from playground.utils import tb_info, temp_chdir
 
+from playground.ui.database import DatabaseTab
 from playground.ui.error import ErrorTab
 # from playground.ui.extract import ExtractTab
-from playground.ui.database import DatabaseTab
 from playground.ui.logs import QueueHandler, register_queue_handler
 from playground.ui.play import PlayTab
+from playground.ui.settings import SettingsTab
 from playground.ui.tasks import TaskManager, PING_INTERVAL
+from playground.ui.trackers import TrackersTab
 from playground.ui.widgets import ConsoleWindow
 
 
@@ -164,41 +166,34 @@ class PlaygroundUI:
         self.tabs = {}
         self.tab_control = ttk.Notebook(self.top_frame)
         
-        logger.debug("Registering Tabs")
-        # self.register_tab()        
+        logger.debug("Registering Tabs")      
         self.register_tab(
-            "Playground",
+            "불안전한 놀이터 ",
             PlayTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
         )
-        # self.register_tab()
         self.register_tab(
-            "Database",
+            "옥냥이 데이터베이스 ",
             DatabaseTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
         )
-        # self.register_tab()
         self.register_tab(
-            "Tracker",
-            DatabaseTab,
+            "투자 성향 ",
+            TrackersTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
         )
-        # self.register_tab()
         self.register_tab(
-            "Settings",
-            DatabaseTab,
+            "설정",
+            SettingsTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
-            task_manager=self.task_manager,            
         )
-        # self.register_tab()
-        # self.register_tab()
         
         # if not playground_config.install_dir:
         #     logger.critical(

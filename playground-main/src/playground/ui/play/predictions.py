@@ -20,12 +20,25 @@ class FirstPredictionFrame(ttk.LabelFrame):
         self.columnconfigure(0, weight=1)
         
         # Course Info
+        self.course_frame = ttk.Frame(self)
+        self.course_frame.grid(column=0, padx=5, pady=5, sticky="we")
+        self.course_frame.rowconfigure(0, weight=1)
+        self.course_frame.columnconfigure(0, weight=1)
+        self.course_frame.columnconfigure(1, weight=1)
+        
         self.course_label = ttk.Label(
-            self, text="맵 이름", style="size10.TLabel", anchor="center"
+            self.course_frame, text="맵 이름", style="size10.TLabel", anchor="center"
         )
-        self.course_label.grid(column=0, padx=5, pady=5, sticky="we")
-        self.course = ttk.Entry(self, width=25)
-        self.course.grid(column=0, padx=5, pady=5, sticky="we")
+        self.course_label.grid(row=0, column=0, padx=5, pady=5,)
+        
+        self.course_remove_btn = ttk.Button(
+            self.course_frame, text="지우기", command=self.clear_entry
+        )
+        self.course_remove_btn.grid(row=0, column=1, padx=5, pady=5, sticky="we")
+        
+        # Course Entry
+        self.course_entry = ttk.Entry(self, width=25)
+        self.course_entry.grid(column=0, padx=5, pady=5, sticky="we")
         
         # N판
         self.game_count_label = ttk.Label(
@@ -33,7 +46,7 @@ class FirstPredictionFrame(ttk.LabelFrame):
         )
         self.game_count_label.grid(column=0, padx=5, pady=5, sticky="we")
         self.game_count = ctk.CTkSlider(
-            self, from_=1, to=5, number_of_steps=5,
+            self, from_=1, to=5, number_of_steps=4,
             command=self.update_game_count_label
         )
         self.game_count.grid(column=0, padx=5, pady=5, sticky="nswe")
@@ -44,32 +57,32 @@ class FirstPredictionFrame(ttk.LabelFrame):
         )
         self.game_goal_label.grid(column=0, padx=5, pady=5, sticky="we")
         self.game_goal = ctk.CTkSlider(
-            self, from_=1, to=25, number_of_steps=25,
+            self, from_=1, to=25, number_of_steps=24,
             command=self.update_game_goal_label
         )
         self.game_goal.grid(column=0, padx=5, pady=5, sticky="nswe")
         
         # track cc
-        self.tmp_label = ttk.Label(
+        self.cc_label = ttk.Label(
             self, text="cc", style="size10.TLabel", anchor="center"
         )
-        self.tmp_label.grid(column=0, padx=5, pady=5, sticky="we")
-        self.tmp = ctk.CTkSlider(
-            self, from_=1, to=25, number_of_steps=25,
-            command=self.update_tmp
+        self.cc_label.grid(column=0, padx=5, pady=5, sticky="we")
+        self.cc = ctk.CTkSlider(
+            self, from_=1, to=4, number_of_steps=3,
+            command=self.update_track_cc_label
         )
-        self.tmp.grid(column=0, padx=5, pady=5, sticky="nswe")
+        self.cc.grid(column=0, padx=5, pady=5, sticky="nswe")
         
         # 참가 인원
-        self.tmp_label = ttk.Label(
-            self, text="참가 인원", style="size10.TLabel", anchor="center"
+        self.part_people_label = ttk.Label(
+            self, text="참가 인원 00명", style="size10.TLabel", anchor="center"
         )
-        self.tmp_label.grid(column=0, padx=5, pady=5, sticky="we")
-        self.tmp = ctk.CTkSlider(
-            self, from_=1, to=25, number_of_steps=25,
-            command=self.update_tmp
+        self.part_people_label.grid(column=0, padx=5, pady=5, sticky="we")
+        self.part_people = ctk.CTkSlider(
+            self, from_=1, to=12, number_of_steps=11,
+            command=self.update_part_people
         )
-        self.tmp.grid(column=0, padx=5, pady=5, sticky="nswe")
+        self.part_people.grid(column=0, padx=5, pady=5, sticky="nswe")
         
     def update_game_count_label(self, value):
         self.game_count_label.config(text=f"{str(int(value))}판")
@@ -77,8 +90,15 @@ class FirstPredictionFrame(ttk.LabelFrame):
     def update_game_goal_label(self, value):
         self.game_goal_label.config(text=f"합계 {str(int(value))}등 이내")
     
-    def update_tmp(self, value):
-        return
+    def update_track_cc_label(self, value):
+        tmp_trans = {1:"100cc", 2:"150cc", 3:"200cc", 4:"mirror"}
+        self.cc_label.config(text=tmp_trans[int(value)])
+    
+    def update_part_people(self, value):
+        self.part_people_label.config(text=f"참가 인원 {str(int(value)).zfill(2)}명")
+    
+    def clear_entry(self):
+        self.course_entry.delete(0, tk.END)
 
 
 class SecondPredictionFrame(FirstPredictionFrame):
