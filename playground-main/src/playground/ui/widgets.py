@@ -1,13 +1,10 @@
 import re
 from queue import Empty
+
+from pandastable import Table
 import tkinter as tk
 from tkinter import PhotoImage, ttk
 import webbrowser
-
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QInputMethodEvent
-from PyQt5.QtWidgets import QLineEdit
-
 
 from playground.config import Config
 from playground.constants import BASE_DIR
@@ -239,3 +236,12 @@ class DebounceEntry(Entry):
         self._on_key_func = func
         if debounce_ms is not None:
             self._debounce_ms = debounce_ms
+
+
+class CustomTable(Table):
+    def __init__(self, parent, dataframe, *args, **kwargs):
+        super().__init__(parent, dataframe=dataframe, editable=False, *args, **kwargs)
+        self.font = "Malgun Gothic"
+        self.fontsize = "10"
+        self.setFont()
+        self.setTheme("default")    # dark, bold

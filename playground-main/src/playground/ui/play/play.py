@@ -72,7 +72,7 @@ class PlayTab(Tab):
                 
         # Track 1: Button
         self.button_play = ttk.Button(self, text="불안전한 놀이터!", command=self.predict)
-        self.button_play.grid(row=3, column=1, pady=5, padx=5, sticky="nswe")
+        self.button_play.grid(row=3, column=1, pady=5, padx=5, sticky="nsew")
         
         # Track 2: Predictions Frame
         self.predict_frame2 = SecondPredictionFrame(self)
@@ -86,7 +86,7 @@ class PlayTab(Tab):
                 
         # Track 2: Button
         self.button_play2 = ttk.Button(self, text="불안전한 놀이터!")
-        self.button_play2.grid(row=3, column=2, pady=5, padx=5, sticky="nswe")
+        self.button_play2.grid(row=3, column=2, pady=5, padx=5, sticky="nsew")
     
     def load_model(self, version: str, track: int = 0) -> BaseEstimator:
         model_path = BASE_DIR / "static" / "models"
