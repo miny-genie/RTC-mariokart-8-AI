@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 from pandastable import TableModel
 import tkinter as tk
@@ -34,7 +36,7 @@ class DatabaseTab(Tab):
         
         # Search Frame
         self.search_frame = FiltersFrame(
-            self.top_frame, play_tab=self, function_callback=self.reset_table
+            self.top_frame, play_tab=self, function_callback=self.reset_tab
         )
         self.search_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         
@@ -46,7 +48,8 @@ class DatabaseTab(Tab):
         current_path = BASE_DIR / "ui" / "database"
         self.origin_csv = pd.read_csv(current_path / "train_data.csv")
         self.database = CustomTable(
-            self.database_frame,
+            tab=self,
+            parent=self.database_frame,
             dataframe=self.origin_csv.copy(),
             showtoolbar=False,
             showstatusbar=False,
@@ -70,6 +73,51 @@ class DatabaseTab(Tab):
         self.graph3 = ttk.LabelFrame(self.graph_frame, text="test")
         self.graph3.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
     
-    def reset_table(self):
+    def reset_tab(self):
+        try:
+            self.graph1.winfo_children()[0].destroy()
+            self.graph2.winfo_children()[0].destroy()
+            self.graph3.winfo_children()[0].destroy()
+        except IndexError:
+            pass
         self.database.updateModel(TableModel(self.origin_csv.copy()))
         self.database.redraw()
+    
+    def draw_pie_chart(self, value):
+        
+        return
+    
+    def _draw_pie_chart(self, value):
+        # print(value, "RIGHT WAY")
+        fig = plt.Figure(figsize=(2, 2), dpi=100)
+        ax = fig.add_subplot(111)
+        data = [int(value), 100 - int(value)]  # 예시 데이터
+        # labels = ['Selected Value', 'Others']
+        ax.pie(data, autopct='%1.1f%%')
+
+        # 이전 그래프 삭제
+        for widget in self.graph1.winfo_children():
+            widget.destroy()
+
+        # 그래프를 tkinter 위젯에 배치
+        canvas = FigureCanvasTkAgg(fig, master=self.graph1)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        # 이전 그래프 삭제
+        for widget in self.graph2.winfo_children():
+            widget.destroy()
+
+        # 그래프를 tkinter 위젯에 배치
+        canvas = FigureCanvasTkAgg(fig, master=self.graph2)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        # 이전 그래프 삭제
+        for widget in self.graph3.winfo_children():
+            widget.destroy()
+
+        # 그래프를 tkinter 위젯에 배치
+        canvas = FigureCanvasTkAgg(fig, master=self.graph3)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)

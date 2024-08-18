@@ -3,13 +3,15 @@ import logging
 import tkinter as tk
 from tkinter import ttk
 
+from playground.ui.widgets import DebounceEntry
+
 logger = logging.getLogger(__name__)
 
 
-class FirstPredictionFrame(ttk.LabelFrame):
+class PredictionFrame(ttk.LabelFrame):
     def __init__(self, parent):
-        logger.debug("Initializing Playground FirstPredictionFrame")
-        super().__init__(parent, text="Track 1")
+        logger.debug("Initializing Playground PredictionFrame")
+        super().__init__(parent, text="Track")
         self.parent = parent
         
         # Style config
@@ -101,15 +103,18 @@ class FirstPredictionFrame(ttk.LabelFrame):
         self.course_entry.delete(0, tk.END)
 
 
-class SecondPredictionFrame(FirstPredictionFrame):
+class SaveFrame(ttk.LabelFrame):
     def __init__(self, parent):
-        logger.debug("Initializing Playground SecondPredictionFrame")
-        super().__init__(parent)
-        self.config(text="Track 2")
+        logger.debug("Initializing Playground SaveFrame")
+        super().__init__(parent, text="Result Save")
         self.parent = parent
         
-        # # Course Info
-        # self.course_label2 = ttk.Label(self.predict_frame2, text="맵 이름: ")
-        # self.course_label2.grid(sticky="nswe")
-        # self.course2 = ttk.Entry(self.predict_frame2, width=25)
-        # self.course2.grid()
+        # Style config
+        self.style = ttk.Style()
+        self.style.configure("size10.TLabel", font=("맑은 고딕", 10))
+        
+        # self.rowconfigure()
+        self.columnconfigure(0, weight=1)
+        
+        self.temp = DebounceEntry(self, width="30")
+        self.temp.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")

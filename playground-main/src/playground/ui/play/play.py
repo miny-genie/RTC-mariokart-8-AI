@@ -10,16 +10,17 @@ from playground.constants import BASE_DIR
 from playground.ui.database.constants import COURSE_TO_ENCODE, COURSE_NAMING
 from playground.ui.play.courses import CourseFrame
 from playground.ui.play.filters import FiltersFrame
-from playground.ui.play.predictions import FirstPredictionFrame, SecondPredictionFrame
+from playground.ui.play.predictions import PredictionFrame, SaveFrame
 from playground.ui.play.results import ResultFrame
 from playground.ui.widgets import ScrollableFrameLegacy, Tab
 
 
 class PlayTab(Tab):
     def __init__(
-        self, tab_control, playground_config: Config, task_manager, *args, **kwargs
+        self, tab_control, playground_config: Config, task_manager, tabs, *args, **kwargs
     ):
         super().__init__(tab_control, *args, **kwargs)
+        self.tabs = tabs
         self.tab_control = tab_control
         self.playground_config = playground_config
         self.task_manager = task_manager
@@ -61,32 +62,31 @@ class PlayTab(Tab):
         self.course_frame.grid(row=1, column=0, sticky="nsew")
         
         # Track 1: Predictions Frame
-        self.predict_frame = FirstPredictionFrame(self)
+        self.predict_frame = PredictionFrame(self)
         self.predict_frame.grid(
             row=0, column=1, rowspan=2, padx=5, pady=5, sticky="nsew"
         )
         
-        # Track 1: Result Frame
+        # Track: Result Frame
         self.result_frame = ResultFrame(self)
         self.result_frame.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
                 
-        # Track 1: Button
+        # Track: Button
         self.button_play = ttk.Button(self, text="불안전한 놀이터!", command=self.predict)
         self.button_play.grid(row=3, column=1, pady=5, padx=5, sticky="nsew")
         
-        # Track 2: Predictions Frame
-        self.predict_frame2 = SecondPredictionFrame(self)
-        self.predict_frame2.grid(
-            row=0, column=2, rowspan=2, padx=5, pady=5, sticky="nsew"
+        # Prediction Result Save Frame
+        self.save_frame = SaveFrame(self)
+        self.save_frame.grid(
+            row=0, column=2, rowspan=3, padx=5, pady=5, sticky="nsew"
         )
         
-        # Track 2: Result Frame
-        self.result_frame2 = ResultFrame(self)
-        self.result_frame2.grid(row=2, column=2, padx=5, pady=5, sticky="nsew")
-                
-        # Track 2: Button
-        self.button_play2 = ttk.Button(self, text="불안전한 놀이터!")
-        self.button_play2.grid(row=3, column=2, pady=5, padx=5, sticky="nsew")
+        # Save Button
+        self.button_save = ttk.Button(self, text="데이터 저장", command=self.save)
+        self.button_save.grid(row=3, column=2, pady=5, padx=5, sticky="nsew")
+    
+    def set_personal_tab(self, tab) -> None:
+        self.personal_tab = tab
     
     def load_model(self, version: str, track: int = 0) -> BaseEstimator:
         model_path = BASE_DIR / "static" / "models"
@@ -129,4 +129,8 @@ class PlayTab(Tab):
         self.result_frame.rank_probability.config(
             text=f"{reg_result}"
         )
+        return
+    
+    def save(self):
+        print(self.tabs["개인 투자 기록 "].temp.cget("text"))
         return

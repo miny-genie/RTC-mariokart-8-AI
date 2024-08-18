@@ -104,17 +104,12 @@ class CourseFrame(ttk.Frame):
             lbl.grid(row=row*2+1, column=col, padx=1, pady=1, sticky="nswe")
     
     def launch(self, img_num):
-        first_course = self.play_tab.predict_frame.course_entry
-        second_course = self.play_tab.predict_frame2.course_entry
+        course = self.play_tab.predict_frame.course_entry
         png_name = f"course{str(img_num).zfill(3)}.png"
         name = COURSE_NAMING[png_name][4]
-        
-        if first_course.get() == "":         
-            first_course.delete(0, tk.END)
-            first_course.insert(0, name)
-        else:
-            second_course.delete(0, tk.END)
-            second_course.insert(0, name)
+              
+        course.delete(0, tk.END)
+        course.insert(0, name)
         
     def filter_buttons(self, search_term):
         def isENG(text: str) -> bool:

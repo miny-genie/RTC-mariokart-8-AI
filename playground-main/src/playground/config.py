@@ -127,7 +127,7 @@ class Config:
         return self.config_path.with_suffix(f"{self.config_path.suffix}.tmp")
     
     def save(self):
-        print(self.config_path)
+        # print(self.config_path)
         if self.config_path is None:
             raise TypeError("config_path shouldn't be None")
         self.dirty = False

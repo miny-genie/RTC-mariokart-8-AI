@@ -19,6 +19,7 @@ from playground.ui.database import DatabaseTab
 from playground.ui.error import ErrorTab
 # from playground.ui.extract import ExtractTab
 from playground.ui.logs import QueueHandler, register_queue_handler
+from playground.ui.personal import PersonalTab
 from playground.ui.play import PlayTab
 from playground.ui.settings import SettingsTab
 from playground.ui.tasks import TaskManager, PING_INTERVAL
@@ -173,14 +174,23 @@ class PlaygroundUI:
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
+            tabs = self.tabs,
         )
         self.register_tab(
-            "옥냥이 데이터베이스 ",
+            "사관 데이터 ",
             DatabaseTab,
             tab_control=self.tab_control,
             playground_config=playground_config,
             task_manager=self.task_manager,
         )
+        self.register_tab(
+            "개인 투자 기록 ",
+            PersonalTab,
+            tab_control=self.tab_control,
+            playground_config=playground_config,
+            task_manager=self.task_manager,
+        )
+        # self.tabs["불안전한 놀이터 "].set_personal_tab(self.tabs["개인 투자 기록 "])
         self.register_tab(
             "투자 성향 ",
             TrackersTab,
@@ -189,7 +199,7 @@ class PlaygroundUI:
             task_manager=self.task_manager,
         )
         self.register_tab(
-            "설정",
+            "설정 ",
             SettingsTab,
             tab_control=self.tab_control,
             playground_config=playground_config,

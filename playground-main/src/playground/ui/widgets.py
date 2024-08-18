@@ -239,9 +239,21 @@ class DebounceEntry(Entry):
 
 
 class CustomTable(Table):
-    def __init__(self, parent, dataframe, *args, **kwargs):
+    def __init__(self, tab, parent, dataframe, *args, **kwargs):
         super().__init__(parent, dataframe=dataframe, editable=False, *args, **kwargs)
+        self.tab = tab
+        self.parent = parent
+        
         self.font = "Malgun Gothic"
         self.fontsize = "10"
         self.setFont()
         self.setTheme("default")    # dark, bold
+        
+        # MLB release event
+        self.bind("<ButtonRelease-1>", self.on_click_cell)
+    
+    def on_click_cell(self, event):
+        curr_row = self.get_row_clicked(event)
+        curr_col = self.get_col_clicked(event)
+        curr_val = self.model.getValueAt(self.curr_row, self.curr_col)        
+        self.tab.draw_pie_chart(self.curr_val)
