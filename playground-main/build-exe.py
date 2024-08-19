@@ -9,14 +9,14 @@ OPTIONAL_DATA = [
     "dist/s99-client.exe;.",
 ]
 DATA = [
-    "src/modlunky2/VERSION;.",
-    "src/modlunky2/static;static",
+    "src/playground/VERSION;.",
+    "src/playground/static;static",
 ]
 BASE_DIR = Path(__file__).parent.resolve()
 
 DEBUG_DIR = Path("target/debug")
 RELEASE_DIR = Path("target/release")
-EXE_NAME = Path("modlunky2.exe")
+EXE_NAME = Path("unsafe playground.exe")
 
 
 def run_pyinstaller(debug):
@@ -32,8 +32,8 @@ def run_pyinstaller(debug):
 
     pyinstaller_args.extend(
         [
-            "--name=modlunky2",
-            f"--icon={BASE_DIR / 'src/modlunky2/static/images/icon.ico'}",
+            "--name=playground",
+            f"--icon={BASE_DIR / 'src/playground/static/images/icon.ico'}",
             "--clean",
             "--onedir",
             "--noconfirm",

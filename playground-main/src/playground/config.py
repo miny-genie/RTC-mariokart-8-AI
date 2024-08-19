@@ -14,6 +14,11 @@ from serde.de import deserialize
 from serde.se import serialize
 import serde.json
 
+from playground.utils import is_windows
+
+if is_windows():
+    # Import for pyinstaller to detect this module
+    import platformdirs.windows    # pylint: disable=unused-import
 
 APP_AUTHOR = "minyGenie"
 APP_NAME = "playground"
@@ -34,6 +39,12 @@ DEFAULT_FONT_FAMILY = "Helvetica"
 T = TypeVar("T")
 
 logger = logging.getLogger(__name__)
+
+
+def make_user_dirs():
+    for dir_ in [CONFIG_DIR, DATA_DIR, CACHE_DIR]:
+        if not dir_.exists():
+            dir_.mkdir(parents=True, exist_ok=True)
 
 
 @dataclass
