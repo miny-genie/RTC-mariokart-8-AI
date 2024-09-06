@@ -56,6 +56,7 @@ class ConsoleWindow(ttk.Frame):
         self.scrolled_text.text.yview(tk.END)
     
     def poll_log_queue(self):
+        # Check every 100ms if there is a new message in the queue to display
         while True:
             try:
                 record = self.queue_handler.log_queue.get(block=False)

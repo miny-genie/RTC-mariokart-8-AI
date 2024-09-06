@@ -6,8 +6,10 @@ import tkinter as tk
 import traceback
 from tkinter import PhotoImage, ttk
 from multiprocessing import Queue
-from pathlib import Path
-from PIL import Image, ImageTk
+
+# from pathlib import Path
+# from PIL import Image, ImageTk
+# import tkinterDnD
 
 from playground.constants import BASE_DIR, IS_EXE
 from playground.updater import self_update
@@ -167,7 +169,7 @@ class PlaygroundUI:
         self.tabs = {}
         self.tab_control = ttk.Notebook(self.top_frame)
         
-        logger.debug("Registering Tabs")      
+        logger.debug("Registering Tabs")
         self.register_tab(
             "불안전한 놀이터 ",
             PlayTab,

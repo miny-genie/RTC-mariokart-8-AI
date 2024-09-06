@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).parent.resolve()
 
 DEBUG_DIR = Path("target/debug")
 RELEASE_DIR = Path("target/release")
-EXE_NAME = Path("unsafe playground.exe")
+EXE_NAME = Path("playground.exe")
 
 
 def run_pyinstaller(debug):
@@ -42,7 +42,7 @@ def run_pyinstaller(debug):
 
     if not debug:
         pyinstaller_args.append("--noconsole")
-
+    
     subprocess.check_call(pyinstaller_args)
 
 
@@ -61,14 +61,14 @@ def build_launcher(debug):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Build modlunky2 exe")
+    parser = argparse.ArgumentParser(description="Build playground exe")
     parser.add_argument(
         "--debug", action="store_true", help="Whether to build debug exe."
     )
     args = parser.parse_args()
     run_pyinstaller(args.debug)
     build_launcher(args.debug)
-
+    
     artifact_dir = RELEASE_DIR
     if args.debug:
         artifact_dir = DEBUG_DIR
