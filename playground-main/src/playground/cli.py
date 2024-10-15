@@ -65,3 +65,8 @@ def main():
     except Exception:    # pylint: disable=broad-except
         logger.critical("%s", tb_info())
         input("Failed to launch Playground. Press Enter to exit...")
+
+# Argparse의 Write 에러 발생
+# Pyinstaller의 --noconsole 옵션 활성화 시 발생하는 오류
+# 문구를 출력해야 하나 출력할 콘솔이 없어서 발생
+# QueueHandler의 log console이랑 연결 확인할 것
