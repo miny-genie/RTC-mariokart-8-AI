@@ -12,25 +12,6 @@ from playground.utils import tb_info
 logger = logging.getLogger("playground.cli")
 
 
-def launch(args, log_level):
-    make_user_dirs()
-    launcher_exe: Optional[Path] = args.launcher_exe
-    exe_dir = None
-    if launcher_exe:
-        exe_dir = launcher_exe.parent
-    
-    config = Config.from_path(
-        config_path=args.config_file,
-        launcher_exe=launcher_exe,
-        exe_dir=exe_dir,
-    )
-    
-    # shutdown_callback = web_service.launch_in_thread(config)
-    native_ui = PlaygroundUI(config, log_level)
-    native_ui.mainloop()
-    # shutdown_callback()
-
-
 def main():
     parser = argparse.ArgumentParser(description="Tool for modding Playground.")
     parser.add_argument(
@@ -65,6 +46,26 @@ def main():
     except Exception:    # pylint: disable=broad-except
         logger.critical("%s", tb_info())
         input("Failed to launch Playground. Press Enter to exit...")
+        
+        
+def launch(args, log_level):
+    make_user_dirs()
+    launcher_exe: Optional[Path] = args.launcher_exe
+    exe_dir = None
+    if launcher_exe:
+        exe_dir = launcher_exe.parent
+    
+    config = Config.from_path(
+        config_path=args.config_file,
+        launcher_exe=launcher_exe,
+        exe_dir=exe_dir,
+    )
+    
+    # shutdown_callback = web_service.launch_in_thread(config)
+    native_ui = PlaygroundUI(config, log_level)
+    native_ui.mainloop()
+    # shutdown_callback()
+
 
 # Argparse의 Write 에러 발생
 # Pyinstaller의 --noconsole 옵션 활성화 시 발생하는 오류
